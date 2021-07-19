@@ -37,7 +37,7 @@ Considering these assumptions and that this was a personal project done for fun 
 
 ## Processing Environment
 
-AWS services were used for as much of the processing as possible. A postgres RDS instance with PostGIS and PGRouting extensions was setup in the cloud and used for the rout calculations.  AWS Batch was also utilized for the python parallel processing in bulk of the time series images.
+AWS services were used for as much of the processing as possible. A postgres RDS instance with PostGIS and PGRouting extensions was set up in the cloud and used for the route calculations.  AWS Batch was also utilized for the python parallel processing in bulk of the time series images.
 
 OGR2OGR command line scripting loaded all of the data into the RDS instance.  
 
@@ -51,7 +51,7 @@ Exploratory data analysis revealed that the reservations within this dataset wer
 Examining the trip information (a trip being defined as an origin point in a zip code and a destination point at a rec.gov facility) for the dataset revealed that there were approximately 690K unique possible routes that would need to be created to understand the flow of recreation related road trips throughout the year.
 
 ## Feature Engineering Workflow of Road Trip Networks
-Being interested in the flow of people over time from their starting location to their destination, the first thing I needed was a quality road network on a large scale.  Open Street maps provides a road network within its lines dataset that is part of downloadable pbf file for all the US.  The full packaged when downloaded is over 7+ gigs.  Using OGR2OGR and sql where statements to select only the lines table and within that, only the data that is needed, I was able to upload a set of lines representing the major and semi-major roads across most of the US to my RDS postgres instance.  The resulting lines table contained over 2.5M rows.
+Being interested in the flow of people over time from their starting location to their destination, the first thing I needed was a quality road network on a large scale.  Open Street maps provides a road network within its lines dataset that is part of downloadable PDF file for all the US.  The full packaged when downloaded is over 7+ gigs.  Using OGR2OGR and sql where statements to select only the lines table and within that, only the data that is needed, I was able to upload a set of lines representing the major and semi-major roads across most of the US to my RDS postgres instance.  The resulting lines table contained over 2.5M rows.
 
 ```
 ogr2ogr -sql "SELECT * FROM lines WHERE lines.highway='motorway' or lines.highway='motorway_link' or lines.highway='primary' or lines.highway='primary_link' or lines.highway='secondary' or lines.highway='secondary_link' or lines.highway='tertiary' or lines.highway='tertiary_link' or lines.highway='trunk'" -f PostgreSQL PG:"host=xxxxxxxxxxx.rds.amazonaws.com port=5432 user='xxxxx' password='xxxxxxx' dbname='postgres'" "us-latest.osm.pbf" --config OSM_MAX_TMPFILE_SIZE 1024
@@ -59,7 +59,7 @@ ogr2ogr -sql "SELECT * FROM lines WHERE lines.highway='motorway' or lines.highwa
 
 Basic post processing of the data from here included calculating a new field for estimated travel time along each line (based on type of road and length of segment) and data type cleanup for various columns.
 
-Using the PGRouting extension within my postges rds database, the OSM lines were transformed into a functioning topology.  Once the network was enabled, I used the st function xxxx to minimize the cost (travel time) and find the shortest path between two designated vertexes.   When testing this algorithm on calculating 5 trips, I quickly realized that the algorithm was expensive and that it would not be feasible to run it on the 690k unique trips.  
+Using the PGRouting extension within my postges rds database, the OSM lines were transformed into a functioning topology.  Once the network was enabled, I used the PGR function dijkstra to minimize the cost (travel time) and find the shortest path between two designated nodes.   When testing this algorithm on calculating 5 trips, I quickly realized that the algorithm was expensive and that it would not be feasible to run it on the 690k unique trips.  
 
 Considering that I was only interested in the general flow network of people recreating on a national level I realized that I did not need the level of detail provided by the 690k unique routes.  Rather I just generally needed to see where people were starting and ending.  To overcome this problem, I used spatial clustering algorithms to group geographic locations that are nearby each other.  This allowed me to group the tens of thousands of zip codes into 300 groups.   
 
@@ -67,17 +67,17 @@ Considering that I was only interested in the general flow network of people rec
 ![](images/zip_code_clusters.PNG)
 
 
-Similarly, I clustered the rec locations that were nearby each other into 110 groups.  Combining the two results, I ended up with ~20k unique origin/destinations trips. A much more manageable number of routes to calculate.
+Similarly, I clustered the rec locations that were near each other into 110 groups.  Combining the two results, I ended up with ~20k unique origin/destinations trips. A much more manageable number of routes to calculate.
 
 #### Recreation Facility Clusters
 ![](images/rec_clusters.png)
 
-Even though the route number was now a fraction of the original size, it was still very large considering that each route took about 10 seconds to calculate.  Parallel processing of the routes was needed to complete this task.  To do this, I first upgraded my rds instance to the option with the largest cpu available on AWS.  Working quickly (because time is money) I used python sqlalchemy to break the query up into chunks of calculating 20 routes at a time.  I then threw all of these smaller queries at the database to process as fast as possible in parallel.  Processing time for the dataset of 22k ended up being about a half hour… so not too bad.
+Even though the route number was now a fraction of the original size, it was still very large considering that each route took about 10 seconds to calculate.  Parallel processing of the routes was needed to complete this task.  To do this, I first upgraded my rds instance to the option with the largest number of cpus available on AWS.  Working quickly (because time is money) I used python sqlalchemy to break the query up into chunks of calculating 20 routes at a time.  I then threw all of these smaller queries at the database to process as fast as possible in parallel.  Processing time for the dataset of 22k ended up being about a half hour… so not too bad.
 
 The final step in processing the route data was to simplify the final route lines and to break them up into segments based on estimates of how far people are willing to drive each day on a roadtrip.  I then joined these likely routes back to the rec.gov table to bring routing and reservation data into a single table. 
 
 ## Visualization
-After all of the data cleaned and the feature engineering of the routes was completed, I turned towards visualizing the flows of people along the routes over time.   I decided to create a gif that stitched together images of the routes being traveled each day for all of 2020. Selecting for each day the reservation maker’s location (starting point, likely in transit route, or at their destination), I visualized this on a map using geopandas and rasterio.  The resulting video can be seen at the top of the page.
+After all of the data was cleaned and the feature engineering of the routes was completed, I turned towards visualizing the flows of people along the routes over time.   I decided to create a gif that stitched together images of the routes being traveled each day for all of 2020. Selecting for each day the reservation maker’s location (starting point, likely in transit route, or at their destination), I visualized this on a map using geopandas and rasterio.  The resulting video can be seen at the top of the page.
 
 
 ## Analysis and initial conclusions
@@ -88,4 +88,4 @@ The final visualization provided much initial insight into the flow of people fo
 
 
 ## Future work
-This dataset has endless possibilities.  I would love to explore what this data can teach us about the peak seasons for different popular destinations vs the shoulder seasons.  I would also better understand the lifecycle of planning a trip which includes the date when the reservation is first made.  I would also like to geographically focus in on a single area – such as Colorado – and see the movement of Coloradans as they recreate. 
+This dataset has endless possibilities.  I would love to explore what this data can teach us about the peak seasons for different popular destinations vs the shoulder seasons.  I would also like to better understand the lifecycle of planning a trip which includes the date when the reservation is first made.  I would also like to geographically focus in on a single area – such as Colorado – and see the movement of Coloradans as they recreate.
