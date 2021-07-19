@@ -1,0 +1,9 @@
+ogr2ogr -sql "SELECT * FROM lines WHERE lines.highway='motorway' or lines.highway='motorway_link' or lines.highway='primary' or lines.highway='primary_link' or lines.highway='secondary' or lines.highway='secondary_link' or lines.highway='tertiary' or lines.highway='tertiary_link' or lines.highway='trunk'" -f PostgreSQL PG:"host=xxxxxxxxxxx.rds.amazonaws.com port=5432 user='xxxxx' password='xxxxxxx' dbname='postgres'" "us-latest.osm.pbf" --config OSM_MAX_TMPFILE_SIZE 1024
+
+
+
+ogr2ogr -f PostgreSQL PG:"host=xxxxxxxxxxx.rds.amazonaws.com port=5432 user='xxxxx' password='xxxxxx' dbname='xxxxx'" "fy20_historical_reservations_full.csv" --config OSM_MAX_TMPFILE_SIZE 1024
+
+
+
+ogr2ogr -f PostgreSQL PG:"host=xxxxxxxxxxxxx.rds.amazonaws.com port=5432 user='xxxxx' password='xxxxx' dbname='postgres'" "us_zip_code_points_2163.csv" --config OSM_MAX_TMPFILE_SIZE 1024
