@@ -3,7 +3,7 @@
 
 #### Time series map of travel to recreational sites
 - green = number of people with reservations at recreational facility
-- purple lines = volume of people traveling on a road to recreational facility 
+- purple lines = volume of people traveling on a road to a recreational facility 
 
 https://user-images.githubusercontent.com/13025142/126238503-7e666a0d-2490-488a-8395-b7e37672000f.mp4
 
