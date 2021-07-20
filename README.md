@@ -2,18 +2,18 @@
 ## By Emily Hueni - July 2021
 
 #### Map of travel to recreational sites
-- green = Number of people with reservations at recreational facility
+- green = number of people with reservations at recreational facility
 - purple lines = density of people traveling on a road for recreational purposes 
 
 https://user-images.githubusercontent.com/13025142/126238503-7e666a0d-2490-488a-8395-b7e37672000f.mp4
 
 
-## Background and questions
+## Background and Questions
 
 Over the last year, interest in outdoor activity dramatically increased due to the pandemic.  In addition, many people – in an effort to maintain social distancing – were reluctant to travel by plane for vacationing purposes.  As a result, 2020 saw a large influx in cross-country road trippers traveling to various public parks and lands to escape from daily pandemic life.  As one of these people myself, I became curious about the flow patterns across the country of people traveling for recreational purposes.  In particular, I wanted to know where people were coming from, where were they going to, and when were they choosing to travel.  Can I identify patterns within the network that help me understand the trip planning lifecycle of Americans?  
 
 
-## The data
+## The Data
 
 To answer my questions, I turned to the recreation.gov reservation data for the year 2020.  This data can be downloaded in bulk as a csv file and it contains approximately 5M reservation records for the year.  Each reservation contained information about the destination location (name, park, lat/longs), and the origin of the party making the reservation (zip code, number of people).  
 
@@ -25,7 +25,7 @@ Finally, US zip code data was used to correlate the rec.gov data to a geospatial
 
 
 
-## Assumptions and disclaimer
+## Assumptions and Disclaimer
 
 There are several known assumptions being made in this project around road trip behavior.  Some of these assumptions are likely incorrect at least some of the time.  Below is an outline of the assumptions made, the justifications for making them, and whether they likely hold true.
 
@@ -84,12 +84,12 @@ The final step in processing the route data was to simplify the final route line
 After all of the data was cleaned and the feature engineering of the routes was completed, I turned towards visualizing the flows of people along the routes over time.   I decided to create a gif that stitched together images of the routes being traveled each day for all of 2020. Selecting for each day the reservation maker’s location (starting point, likely in transit route, or at their destination), I visualized this on a map using geopandas and rasterio.  The resulting video can be seen at the top of the page.
 
 
-## Analysis and initial conclusions
+## Analysis and Initial Conclusions
 The final visualization provided much initial insight into the flow of people for recreational purposes. Several initial conclusions made:
 1.	The Easter egg roll in April is the largest single day reservation event that rec.gov manages and it draws people from all over the country.
 2.	Locals – or people within a day’s driving distance – make up a large part of the reservations made on rec.gov.  This is especially evident when you see the pulsing effect for many of the popular locations that seems to center on weekend days. 
 3.	Unsurprisingly we see an increase in rec.gov reservations up north as the weather warms.
 
 
-## Future work
+## Future Work
 This dataset has endless possibilities.  I would love to explore what this data can teach us about the peak seasons for different popular destinations vs the shoulder seasons.  I would also like to better understand the lifecycle of planning a trip which includes the date when the reservation is first made.  I would also like to geographically focus in on a single area – such as Colorado – and see the movement of Coloradans as they recreate.
