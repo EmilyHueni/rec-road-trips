@@ -1,8 +1,12 @@
 # 2020 Recreational Road Trips
 ## By Emily Hueni - July 2021
 
+#### Map of travel to recreational sites
+- green = Number of people with reservations at recreational facility
+- purple lines = density of people traveling on a road for recreational purposes 
 
 https://user-images.githubusercontent.com/13025142/126238503-7e666a0d-2490-488a-8395-b7e37672000f.mp4
+
 
 ## Background and questions
 
